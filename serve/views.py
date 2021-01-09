@@ -14,7 +14,7 @@ def connect_token(request):
 def list_data(request):
     objs = ServeModel.objects.all()
     _list_data = []
-    for obj in list(objs):
+    for obj in objs:
         _list_data.append(obj.to_serialize())
     print(_list_data)
     return HttpResponse(json.dumps(_list_data))
@@ -26,4 +26,4 @@ def add_serve(request):
     for field in form_data:
         serve_model.__setattr__(field, form_data[field])
     serve_model.save()
-    request.get_host()
+    return HttpResponse()

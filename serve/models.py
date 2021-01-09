@@ -13,7 +13,9 @@ class RootModel(models.Model):
     def to_serialize(self):
         obj_dict = {}
         for key in self.__dict__:
-            obj_dict[key] = self.__dict__[key]
+            val = self.__dict__[key]
+            if type(val) == int or type(val) == str:
+                obj_dict[key] = val
         return obj_dict
 
 
@@ -27,9 +29,9 @@ class ServeModel(RootModel):
     # 服务的磁盘地址
     serve_path = models.CharField(max_length=1000)
     # 上次启动时间
-    last_start_time = models.DateTimeField(blank=True)
+    last_start_time = models.DateTimeField(blank=True, null=True)
     # 上次停止时间
-    last_stop_time = models.DateTimeField(blank=True)
+    last_stop_time = models.DateTimeField(blank=True, null=True)
     # 上次操作人员
     last_opera_user = models.CharField(max_length=20, default='root')
 
