@@ -1,4 +1,6 @@
 import json
+import platform
+import os
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -27,3 +29,11 @@ def add_serve(request):
         serve_model.__setattr__(field, form_data[field])
     serve_model.save()
     return HttpResponse()
+
+# 执行启动脚本
+def start_serve(request):
+    sys_name = platform.system()
+    if sys_name == 'Windows':
+        path = "D:\\"
+        os.chdir(path)
+        os.execl('calc')
