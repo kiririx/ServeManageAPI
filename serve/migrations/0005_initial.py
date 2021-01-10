@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
                 ('serve_domain', models.CharField(max_length=200)),
                 ('serve_port', models.IntegerField()),
                 ('serve_path', models.CharField(max_length=1000)),
-                ('last_start_time', models.DateTimeField(blank=True)),
-                ('last_stop_time', models.DateTimeField(blank=True)),
+                ('last_start_time', models.DateTimeField(blank=True, null=True)),
+                ('last_stop_time', models.DateTimeField(blank=True, null=True)),
                 ('last_opera_user', models.CharField(default='root', max_length=20)),
             ],
             options={
