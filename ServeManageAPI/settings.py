@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pydb',
-        'USER': 'root',
-        "HOST": 'kiririx-asus',
+        'USER': 'kiri',
+        "HOST": '127.0.0.1',
         'PASSWORD': 'javajava321',
         'PORT': '3306'
     }

@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
+from ServeManageAPI.env import Platform, ServeAction
 from serve.models import ServeModel
 
 
@@ -26,7 +27,8 @@ def add_serve(request):
     form_data = json.loads(request.body)
     serve_model = ServeModel()
     for field in form_data:
-        serve_model.__setattr__(field, form_data[field])
+        if field != 'id':
+            serve_model.__setattr__(field, form_data[field])
     serve_model.save()
     return HttpResponse()
 
@@ -47,21 +49,34 @@ def get_param(request, key):
 def start_serve(request):
     serve_id = get_param(request, 'id')
     sm = ServeModel.objects.get(id=serve_id)
-    do_opera_serve(sm, 'stop')
+    do_opera_serve(sm, ServeAction.STOP)
     do_opera_serve(sm)
+    return HttpResponse()
 
 
-def do_opera_serve(serve_model: ServeModel, opera_mode='run'):
+# 执行停止服务脚本
+def stop_serve(request):
+    serve_id = get_param(request, 'id')
+    sm = ServeModel.objects.get(id=serve_id)
+    do_opera_serve(sm, ServeAction.STOP)
+    return HttpResponse()
+
+
+def do_opera_serve(serve_model: ServeModel, opera_mode=ServeAction.RUN):
     sys_name = platform.system()
-    if sys_name == 'Windows':
+    if sys_name == Platform.WINDOWS.value:
         path = serve_model.serve_path
         envs = os.environ
         envs['CATALINA_HOME'] = path
-        proc = subprocess.Popen(path + 'catalina.bat ' + opera_mode, stderr=subprocess.STDOUT,
+        proc = subprocess.Popen(path + '\\bin\\catalina.bat ' + opera_mode.value, stderr=subprocess.STDOUT,
                                 stdout=subprocess.PIPE, shell=True,
                                 env=envs)
         out = proc.stdout
-        for i in iter(out.readline, ''):
-            if len(i) < 1:
+        output_content = ''
+        for line_v in iter(out.readline, ''):
+            if len(line_v) < 1:
                 break
-            print(i.decode('gbk').strip())
+            line_str = line_v.decode('gbk').strip()
+            output_content.join(line_str)
+            print(line_str)
+
