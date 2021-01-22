@@ -42,5 +42,5 @@ class ServeModel(RootModel):
 class ServeLogModel(RootModel):
     serve = models.ForeignKey(ServeModel, on_delete=models.CASCADE)
     log_content = models.TextField()
-    create_time = models.DateTimeField()
+    create_time = models.DateTimeField(auto_now=True)
 

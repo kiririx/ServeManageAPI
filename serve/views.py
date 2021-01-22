@@ -10,7 +10,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from ServeManageAPI.env import Platform, ServeAction
-from serve.models import ServeModel
+from serve.models import ServeModel, ServeLogModel
 
 terminal_text = {}
 
@@ -53,7 +53,6 @@ def get_param(request, key):
 def start_serve(request):
     serve_id = get_param(request, 'id')
     sm = ServeModel.objects.get(id=serve_id)
-    do_opera_serve(sm, ServeAction.STOP)
     do_opera_serve_sync(sm)
     return HttpResponse()
 
@@ -85,18 +84,28 @@ def do_opera_serve(serve_model: ServeModel, opera_mode=ServeAction.RUN, thread_n
                                 env=envs)
         out = proc.stdout
         output_content = ''
+        # 创建日志记录
+        serve_log_model: ServeLogModel = ServeLogModel()
+        serve_log_model.serve_id = serve_model.id
         for line_v in iter(out.readline, ''):
             if len(line_v) < 1:
                 break
             line_str = line_v.decode('gbk').strip()
             output_content = output_content + line_str + '</br>'
-            terminal_text['terminal-' + str(serve_model.id)] = output_content
-            print(line_str)
+            if len(output_content) > 500:
+                serve_log_model.log_content = output_content
+                serve_log_model.save()
+                output_content = ''
+
+            # terminal_text['terminal-' + str(serve_model.id)] = output_content
+            # print(line_str)
 
 
 def get_serve_terminal(request):
     serve_id = get_param(request, 'id')
-    text: str = terminal_text['terminal-' + str(serve_id)]
+    serve_model: ServeModel = ServeModel.objects.get(id=serve_id)
+    # write any code
+    text: str = ''
     return HttpResponse(json.dumps({'text': text}))
 
 
